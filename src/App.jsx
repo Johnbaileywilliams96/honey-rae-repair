@@ -1,57 +1,33 @@
-import { useEffect, useState } from "react"
-import { getAllTickets } from "./services/ticketServices.js"
+
+import { Outlet, Route, Routes } from "react-router-dom"
 import "./App.css"
+import { CustomerList } from "./components/customers/CustomersList.jsx"
+import { EmployeeList } from "./components/employees/EmployeeList.jsx"
+import { TicketList } from "./components/tickets/TicketList.jsx"
+import { NavBar } from "./components/nav/NavBar.jsx"
+import { Welcome } from "./components/Welcome/Welcome.jsx"
+import { CustomerDetails } from "./components/customers/CustomerDetails.jsx"
+
 
 
 export const App = () => {
-const [allTickets, setAllTickets] = useState([])
-const [showEmergencyOnly, setShowEmergencyOnly] = useState(false)
-const [filteredTickets, setFilteredTickets] = useState([])
-
-useEffect(() => {
-  getAllTickets().then(ticketsArray => {
-    setAllTickets(ticketsArray)
-    console.log("tickets set")
-  })
-
-}, [])// only runs on initial render of component. 
-
-useEffect(() => {
-  if (showEmergencyOnly) {
-    const emergencyTickets = allTickets.filter(
-      (ticket) => ticket.emergency === true
-    )
-    setFilteredTickets(emergencyTickets)
-  } else {
-    setFilteredTickets(allTickets)
-  }
-}, [showEmergencyOnly, allTickets])
-
-return <div className="tickets-container">
-  <h2>Tickets</h2>
-  <div>
-    <button className="filter-btn btn-primary"onClick={() => (
-      setShowEmergencyOnly(true))}>Emergency</button>
-  </div>
-  <div>
-    <button className="filter-btn btn-info"onClick={() => (
-      setShowEmergencyOnly(false))}>Show All</button>
-  </div>
-  <article className="tickets">
-    {filteredTickets.map(ticket => {
-      return (
-        <section className="ticket" key={ticket.id}>
-          <header className="ticket-info">#{ticket.id}</header>
-          <div>{ticket.description}</div>
-          <footer>
-            <div>
-              <div className="ticket-info">emergency</div>
-              <div>{ticket.emergency ? "yes" : "no"}</div>
-            </div>
-          </footer>
-        </section>
-      )
-    })}
-  </article>
-</div>
+return <>
+<Routes>
+    <Route path="/" element={
+        <>
+        <NavBar />
+        <Outlet />
+        </>
+    }
+    >
+        <Route index element={<Welcome />} />
+        <Route path="/tickets" element={<TicketList />} />
+        <Route path="/employees" element={<EmployeeList />} />
+        <Route path="/customers">
+            <Route index element={<CustomerList />} />
+            <Route path=":customerId" element={<CustomerDetails />} />
+        </Route>
+    </Route>
+</Routes>
+</>
 }
